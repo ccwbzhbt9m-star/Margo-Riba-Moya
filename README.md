@@ -91,16 +91,55 @@ button {
   font-size: 22px;
   color: #b30059;
 }
+.envelope.open {
+  transform: scale(1.05);
+  transition: 0.6s ease;
+  background: #ff2f75;
+}
+
+.envelope.open .heart {
+  opacity: 0;
+  transition: 0.4s;
+}
+<script>
+const envelope = document.getElementById("envelope");
+const openBtn = document.getElementById("openBtn");
+const photos = document.querySelectorAll(".photos img");
+
+openBtn.onclick = function () {
+  envelope.classList.add("open");
+
+  setTimeout(() => {
+    photos.forEach((img) => {
+      img.style.opacity = 1;
+
+      img.style.top = Math.random() * 70 + "%";
+      img.style.left = Math.random() * 70 + "%";
+    });
+  }, 700);
+};
+</script>
 </style>
 </head>
 
 <body>
 
 <div class="scene">
-
-  <div class="envelope">
-    <div class="heart">💗</div>
-  </div>
+  <div class="photos" id="photos">
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+  <img src="https://via.placeholder.com/100" />
+</div>
+  <div class="envelope" id="envelope">
+  <div class="heart">💗</div>
+</div>
 
   <div class="buttons">
     <button id="openBtn">Open</button>
