@@ -7,6 +7,25 @@ Gift project
 <title>Happy Birthday</title>
 
 <style>
+  .envelope {
+  width: 240px;
+  height: 160px;
+  background: #fff;
+  position: relative;
+  margin: auto;
+  cursor: pointer;
+  box-shadow: 0 10px 0 #f3a6c6;
+  border: 3px solid #f3a6c6;
+  overflow: hidden;
+}
+  .envelope::before {
+  content: "💗";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+}
 body {
   margin: 0;
   height: 100vh;
