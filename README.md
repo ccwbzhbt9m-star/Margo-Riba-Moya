@@ -2,239 +2,205 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Happy Birthday</title>
+<title>Pixel Gift Heart</title>
 
 <style>
 body {
   margin: 0;
-  height: 100vh;
-  background: #ffd6e8;
   overflow: hidden;
-  font-family: Arial;
-}
-
-/* сцена */
-.scene {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-/* КОНВЕРТ (белый пиксельный) */
-.envelope {
-  width: 260px;
-  height: 170px;
   background: #fff;
-  border: 3px solid #f3a6c6;
-  box-shadow: 0 10px 0 #f3a6c6;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.8s ease;
-  overflow: hidden;
+  font-family: monospace;
 }
 
-/* сердечко */
-.envelope::before {
-  content: "💗";
+/* ===== UI ===== */
+#dontOpen {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 42px;
+  top: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  z-index: 10;
   transition: 0.5s;
 }
 
-/* анимация открытия */
-.envelope.open {
-  transform: scale(1.05) rotateX(20deg);
-  opacity: 0;
-}
-
-/* кнопки */
-.buttons {
-  margin-top: 20px;
+#openBtn {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  cursor: pointer;
   z-index: 10;
 }
 
-button {
-  padding: 10px 18px;
-  margin: 5px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-#openBtn {
-  background: #ff4d88;
-  color: white;
-}
-
-#fakeBtn {
-  background: #ffc1d6;
+/* ===== GIFT ===== */
+#gift {
+  width: 120px;
+  height: 120px;
+  background: #fff;
+  border: 3px solid #000;
   position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: 1s;
+  image-rendering: pixelated;
 }
 
-/* фото */
-.photos {
+#gift::before,
+#gift::after {
+  content: "";
   position: absolute;
-  width: 100%;
+  background: #000;
+}
+
+#gift::before {
+  width: 18px;
   height: 100%;
-  top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.photos img {
-  width: 80px;
+#gift::after {
+  height: 18px;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ===== PHOTOS ===== */
+.photo {
+  width: 60px;
+  height: 60px;
   position: absolute;
-  opacity: 0;
-  transition: 1s ease;
+  background-size: cover;
+  border: 2px solid #000;
+  image-rendering: pixelated;
+  transition: 1.2s cubic-bezier(.2,.8,.2,1);
 }
 
-/* сердце финальное */
-.heartZone {
+/* ===== CANVAS BLOBS ===== */
+#glitter {
   position: absolute;
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-/* видео */
-.video {
-  position: absolute;
-  opacity: 0;
-  transition: 1s;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.video.show {
-  opacity: 1;
-}
-
-/* подпись */
-.footer {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-  font-size: 22px;
-  color: #b30059;
-  opacity: 0;
-  transition: 1s;
-}
-
-.footer.show {
-  opacity: 1;
 }
 </style>
 </head>
 
 <body>
 
-<div class="scene">
+<div id="dontOpen">DON'T OPEN</div>
+<button id="openBtn">OPEN</button>
 
-  <div class="envelope" id="envelope"></div>
-
-  <div class="buttons">
-    <button id="openBtn">Open</button>
-    <button id="fakeBtn">Don’t open</button>
-  </div>
-
-  <!-- ФОТО -->
-  <div class="photos" id="photos">
-    <img src="photo1.jpg">
-    <img src="photo2.jpg">
-    <img src="photo3.jpg">
-    <img src="photo4.jpg">
-    <img src="photo5.jpg">
-    <img src="photo6.jpg">
-    <img src="photo7.jpg">
-    <img src="photo8.jpg">
-    <img src="photo9.jpg">
-    <img src="photo10.jpg">
-  </div>
-
-  <!-- ВИДЕО -->
-  <div class="video" id="video">
-    <video width="300" controls>
-      <source src="video.mp4" type="video/mp4">
-    </video>
-  </div>
-
-</div>
-
-<div class="footer" id="footer">
-Happy birthday, Margoshkaa
-</div>
+<div id="gift"></div>
+<canvas id="glitter"></canvas>
 
 <script>
-const envelope = document.getElementById("envelope");
-const openBtn = document.getElementById("openBtn");
-const fakeBtn = document.getElementById("fakeBtn");
-const photos = document.querySelectorAll(".photos img");
-const video = document.getElementById("video");
-const footer = document.getElementById("footer");
 
-let fakeMoves = 0;
+const images = ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"];
 
-/* убегающая кнопка */
-function moveButton() {
-  fakeBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
-  fakeBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+/* ❤️ сердце */
+const heartPoints = [
+  [-90,-40],[-70,-60],[-50,-70],[-30,-60],[-10,-40],[10,-40],[30,-60],[50,-70],[70,-60],[90,-40],
+  [-100,-20],[-80,-40],[-60,-50],[-40,-40],[40,-40],[60,-50],[80,-40],[100,-20],
+  [-100,0],[-80,-10],[-60,0],[-40,10],[40,10],[60,0],[80,-10],[100,0],
+  [-80,20],[-60,30],[-40,40],[-20,50],[0,60],[20,50],[40,40],[60,30],[80,20],
+  [-40,60],[-20,70],[0,80],[20,70],[40,60]
+];
+
+const gift = document.getElementById("gift");
+const btn = document.getElementById("openBtn");
+const dontOpen = document.getElementById("dontOpen");
+
+const canvas = document.getElementById("glitter");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+let photos = [];
+let opened = false;
+
+/* ===== PHOTOS ===== */
+images.forEach((src, i) => {
+  const el = document.createElement("div");
+  el.className = "photo";
+  el.style.backgroundImage = `url(${src})`;
+
+  // старт — центр подарка
+  el.style.left = (window.innerWidth/2 - 30) + "px";
+  el.style.top = (window.innerHeight/2 - 30) + "px";
+
+  document.body.appendChild(el);
+  photos.push(el);
+});
+
+/* ===== GLITTER ===== */
+function spawnGlitter(x,y) {
+  for (let i=0;i<25;i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random()-0.5)*6,
+      vy: (Math.random()-0.5)*6,
+      life: 60
+    });
+  }
 }
 
-fakeBtn.addEventListener("mouseenter", moveButton);
-fakeBtn.addEventListener("click", moveButton);
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-/* открыть */
-openBtn.onclick = function () {
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.05;
+    p.life--;
 
-  envelope.classList.add("open");
+    ctx.fillStyle = "#000";
+    ctx.fillRect(p.x, p.y, 2, 2);
+  });
 
-  setTimeout(() => {
+  particles = particles.filter(p => p.life > 0);
+  requestAnimationFrame(animate);
+}
+animate();
 
-    /* фотки появляются */
-    photos.forEach((img) => {
-      img.style.opacity = 1;
+/* ===== OPEN ===== */
+btn.onclick = () => {
+  if (opened) return;
+  opened = true;
 
-      const x = Math.random() * window.innerWidth * 0.8;
-      const y = Math.random() * window.innerHeight * 0.8;
+  dontOpen.style.opacity = 0;
 
-      img.style.left = x + "px";
-      img.style.top = y + "px";
-    });
+  // подарок исчезает
+  gift.style.transform = "translate(-50%, -50%) scale(0) rotate(180deg)";
+  gift.style.opacity = 0;
 
-    /* через 2 сек — собираются в сердце */
+  // блёстки в центре
+  spawnGlitter(window.innerWidth/2, window.innerHeight/2);
+
+  // фотки в сердце
+  photos.forEach((p, i) => {
+    const pt = heartPoints[i % heartPoints.length];
+
     setTimeout(() => {
+      p.style.left = (window.innerWidth/2 + pt[0]) + "px";
+      p.style.top = (window.innerHeight/2 + pt[1]) + "px";
 
-      photos.forEach((img, i) => {
-
-        const angle = i * (Math.PI * 2 / photos.length);
-        const radius = 120;
-
-        const x = window.innerWidth / 2 + Math.cos(angle) * radius;
-        const y = window.innerHeight / 2 + Math.sin(angle) * radius;
-
-        img.style.left = x + "px";
-        img.style.top = y + "px";
-      });
-
-    }, 2000);
-
-    /* видео */
-    setTimeout(() => {
-      video.classList.add("show");
-      footer.classList.add("show");
-    }, 3500);
-
-  }, 800);
+      spawnGlitter(window.innerWidth/2 + pt[0], window.innerHeight/2 + pt[1]);
+    }, i * 120);
+  });
 };
+
+/* resize */
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
 </script>
 
 </body>
