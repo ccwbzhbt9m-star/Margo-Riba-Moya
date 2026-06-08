@@ -170,7 +170,7 @@ button {
 </div>
 
 <div class="footer" id="footer">
-Happy birthday, Margot
+Happy birthday, Margoshkaa
 </div>
 
 <script>
