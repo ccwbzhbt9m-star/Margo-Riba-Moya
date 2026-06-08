@@ -7,83 +7,68 @@ Gift project
 <title>Happy Birthday</title>
 
 <style>
-  .envelope {
-  width: 240px;
-  height: 160px;
-  background: #fff;
+body {
+  margin: 0;
+  height: 100vh;
+  background: #ffd6e8;
+  overflow: hidden;
+  font-family: Arial;
+}
+
+/* сцена */
+.scene {
+  width: 100%;
+  height: 100%;
   position: relative;
-  margin: auto;
-  cursor: pointer;
-  box-shadow: 0 10px 0 #f3a6c6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* КОНВЕРТ (белый пиксельный) */
+.envelope {
+  width: 260px;
+  height: 170px;
+  background: #fff;
   border: 3px solid #f3a6c6;
+  box-shadow: 0 10px 0 #f3a6c6;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.8s ease;
   overflow: hidden;
 }
-  .envelope::before {
+
+/* сердечко */
+.envelope::before {
   content: "💗";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 40px;
-}
-body {
-  margin: 0;
-  height: 100vh;
-  background: #ffd6e8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial;
-  overflow: hidden;
+  font-size: 42px;
+  transition: 0.5s;
 }
 
-/* сцена */
-.scene {
-  text-align: center;
-}
-
-/* конверт */
-.envelope {
-  width: 220px;
-  height: 160px;
-  background: #ff4d88;
-  position: relative;
-  margin: auto;
-  cursor: pointer;
-  box-shadow: 0 10px 0 #c2185b;
-  transition: 0.6s ease;
-}
-
-.heart {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  font-size: 40px;
-}
-
-/* открытие */
+/* анимация открытия */
 .envelope.open {
-  transform: scale(1.05);
-  background: #ff2f75;
-}
-
-.envelope.open .heart {
+  transform: scale(1.05) rotateX(20deg);
   opacity: 0;
 }
 
 /* кнопки */
 .buttons {
   margin-top: 20px;
+  z-index: 10;
 }
 
 button {
-  padding: 10px 16px;
+  padding: 10px 18px;
   margin: 5px;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  border-radius: 12px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 #openBtn {
@@ -93,13 +78,7 @@ button {
 
 #fakeBtn {
   background: #ffc1d6;
-  position: relative;
-}
-
-#fakeBtn:hover {
-  left: 40px;
-  top: -10px;
-  position: relative;
+  position: absolute;
 }
 
 /* фото */
@@ -109,7 +88,6 @@ button {
   height: 100%;
   top: 0;
   left: 0;
-  pointer-events: none;
 }
 
 .photos img {
@@ -117,6 +95,28 @@ button {
   position: absolute;
   opacity: 0;
   transition: 1s ease;
+}
+
+/* сердце финальное */
+.heartZone {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* видео */
+.video {
+  position: absolute;
+  opacity: 0;
+  transition: 1s;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.video.show {
+  opacity: 1;
 }
 
 /* подпись */
@@ -134,17 +134,6 @@ button {
 .footer.show {
   opacity: 1;
 }
-
-/* видео блок */
-.video {
-  display: none;
-  margin-top: 20px;
-}
-
-.video video {
-  width: 300px;
-  border-radius: 10px;
-}
 </style>
 </head>
 
@@ -152,9 +141,7 @@ button {
 
 <div class="scene">
 
-  <div class="envelope" id="envelope">
-    <div class="heart">💗</div>
-  </div>
+  <div class="envelope" id="envelope"></div>
 
   <div class="buttons">
     <button id="openBtn">Open</button>
@@ -163,28 +150,27 @@ button {
 
   <!-- ФОТО -->
   <div class="photos" id="photos">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
-    <img src="https://via.placeholder.com/100">
+    <img src="photo1.jpg">
+    <img src="photo2.jpg">
+    <img src="photo3.jpg">
+    <img src="photo4.jpg">
+    <img src="photo5.jpg">
+    <img src="photo6.jpg">
+    <img src="photo7.jpg">
+    <img src="photo8.jpg">
+    <img src="photo9.jpg">
+    <img src="photo10.jpg">
   </div>
 
   <!-- ВИДЕО -->
   <div class="video" id="video">
-    <video controls>
-      <source src="" type="video/mp4">
+    <video width="300" controls>
+      <source src="video.mp4" type="video/mp4">
     </video>
   </div>
 
 </div>
 
-<!-- ПОДПИСЬ -->
 <div class="footer" id="footer">
 Happy birthday, Margot
 </div>
@@ -194,24 +180,62 @@ const envelope = document.getElementById("envelope");
 const openBtn = document.getElementById("openBtn");
 const fakeBtn = document.getElementById("fakeBtn");
 const photos = document.querySelectorAll(".photos img");
+const video = document.getElementById("video");
 const footer = document.getElementById("footer");
 
+let fakeMoves = 0;
+
+/* убегающая кнопка */
+function moveButton() {
+  fakeBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  fakeBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+}
+
+fakeBtn.addEventListener("mouseenter", moveButton);
+fakeBtn.addEventListener("click", moveButton);
+
+/* открыть */
 openBtn.onclick = function () {
+
   envelope.classList.add("open");
 
   setTimeout(() => {
-    photos.forEach(img => {
+
+    /* фотки появляются */
+    photos.forEach((img) => {
       img.style.opacity = 1;
-      img.style.top = Math.random() * 70 + "%";
-      img.style.left = Math.random() * 70 + "%";
+
+      const x = Math.random() * window.innerWidth * 0.8;
+      const y = Math.random() * window.innerHeight * 0.8;
+
+      img.style.left = x + "px";
+      img.style.top = y + "px";
     });
 
-    footer.classList.add("show");
-  }, 700);
-};
+    /* через 2 сек — собираются в сердце */
+    setTimeout(() => {
 
-fakeBtn.onclick = function () {
-  alert("🙈");
+      photos.forEach((img, i) => {
+
+        const angle = i * (Math.PI * 2 / photos.length);
+        const radius = 120;
+
+        const x = window.innerWidth / 2 + Math.cos(angle) * radius;
+        const y = window.innerHeight / 2 + Math.sin(angle) * radius;
+
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+      });
+
+    }, 2000);
+
+    /* видео */
+    setTimeout(() => {
+      video.classList.add("show");
+      footer.classList.add("show");
+    }, 3500);
+
+  }, 800);
 };
 </script>
 
