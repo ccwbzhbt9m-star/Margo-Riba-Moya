@@ -1,5 +1,3 @@
-# Margo-Riba-Moya
-Gift project
 <!DOCTYPE html>
 <html lang="ru">
 <head>
